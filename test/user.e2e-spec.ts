@@ -133,12 +133,12 @@ describe("mutation module (e2e)", () => {
     })
 
     it('/api/user/update_password (POST) 400 condition', async () => {
-        const response = await request(app.getHttpServer()).post("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`)
+        const response = await request(app.getHttpServer()).put("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`)
         expect(response.status).toBe(400)
     })
 
     it('/api/user/update_password (POST) 401 condition invalid current_password', async () => {
-        const response = await request(app.getHttpServer()).post("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
+        const response = await request(app.getHttpServer()).put("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
             current_password: invalid_password,
             new_password: new_password,
             confirm_new_password: new_password
@@ -147,7 +147,7 @@ describe("mutation module (e2e)", () => {
     })
 
     it('/api/user/update_password (POST) 200 condition', async () => {
-        const response = await request(app.getHttpServer()).post("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
+        const response = await request(app.getHttpServer()).put("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
             current_password: current_password,
             new_password: new_password,
             confirm_new_password: new_password
@@ -156,7 +156,7 @@ describe("mutation module (e2e)", () => {
     })
 
     it('/api/user/update_password (POST) 400 condition (new password same with old password)', async () => {
-        const response = await request(app.getHttpServer()).post("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
+        const response = await request(app.getHttpServer()).put("/api/user/update_password").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
             current_password: new_password,
             new_password: new_password,
             confirm_new_password: new_password
@@ -165,7 +165,7 @@ describe("mutation module (e2e)", () => {
     })
 
     it('/api/user/update_password (POST) 401 condition', async () => {
-        const response = await request(app.getHttpServer()).post("/api/user/update_password")
+        const response = await request(app.getHttpServer()).put("/api/user/update_password")
         expect(response.status).toBe(401)
     })
 })

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, UseGuards, Request, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, UseGuards, Request, Res, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -33,7 +33,7 @@ export class UserController {
     })
   }
 
-  @Post("/update_password")
+  @Put("/update_password")
   async updatePassword(@Request() req, @Body() updateUserDto: UpdatePasswordDTO, @Res() res: Response) {
     const { userId } = req.user
     await this.userService.updatePassword(userId, updateUserDto)
