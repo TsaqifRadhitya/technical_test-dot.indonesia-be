@@ -1,27 +1,5 @@
 import { IsEmail, IsString, IsStrongPassword, registerDecorator, Validate, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-
-export function IsEqualTo(property: string, validationOptions?: ValidationOptions) {
-    return function (object: Object, propertyName: string) {
-        registerDecorator({
-            name: 'IsEqualTo',
-            target: object.constructor,
-            propertyName,
-            options: validationOptions,
-            constraints: [property],
-            validator: {
-                validate(value: any, args: ValidationArguments) {
-                    const [relatedPropertyName] = args.constraints;
-                    const relatedValue = (args.object as any)[relatedPropertyName];
-                    return value === relatedValue;
-                },
-                defaultMessage(args: ValidationArguments) {
-                    const [relatedPropertyName] = args.constraints;
-                    return `${propertyName} must match ${relatedPropertyName}`;
-                },
-            },
-        });
-    };
-}
+import { IsEqualTo } from "../../decorators/is-equals-to.decorator";
 
 export class RegisterDTO {
     @IsString()
@@ -30,10 +8,22 @@ export class RegisterDTO {
     @IsEmail()
     email: string
 
-    @IsStrongPassword()
+    @IsStrongPassword({
+        minLength: 8,
+        minLowercase: 1,
+        minSymbols: 1,
+        minNumbers: 1,
+        minUppercase: 1
+    })
     password: string
 
-    @IsStrongPassword()
+    @IsStrongPassword({
+        minLength: 8,
+        minLowercase: 1,
+        minSymbols: 1,
+        minNumbers: 1,
+        minUppercase: 1
+    })
     @IsEqualTo("password")
     confirm_password: string;
 }

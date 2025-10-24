@@ -14,7 +14,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(email: string, password: string): Promise<any> {
-        const dto = plainToInstance(LoginDTO, { email, password })
+        const payload = {
+            email: email || undefined,
+            password: password || undefined,
+        };
+
+        const dto = plainToInstance(LoginDTO, payload || {})
         const errors = await validate(dto)
         if (errors.length > 0) {
             const messages = errors.flatMap(err =>
@@ -23,7 +28,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
             throw new BadRequestException(messages);
         }
 
-        const user = await this.authService.validateUser(email, password);
+        const user = await this.authService.validateUser(dto.email, dto.password);
         if (!user) {
             throw new UnauthorizedException();
         }

@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
-import * as bcrypt from "bcrypt"
+import { UserService } from '../user/user.service';
+import { RegisterDTO } from './dto/register.dto';
+import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
 
-    constructor(private usersService: UserService, private jwtService: JwtService) {
+    constructor(@InjectRepository(User) private userRepository: Repository<User>, private usersService: UserService, private jwtService: JwtService) {
 
     }
 
@@ -25,7 +29,22 @@ export class AuthService {
         };
     }
 
-    async register() {
-
+    async register(data: RegisterDTO) {
+        const hashedPassword = await bcrypt.hash(data.password, 10)
+        try {
+            return await this.userRepository.insert({
+                email: data.email,
+                name: data.name,
+                password: hashedPassword
+            })
+        } catch {
+            throw new BadRequestException({
+                status: 400,
+                message: 'validation exception',
+                error: {
+                    email: "email already exists"
+                },
+            })
+        }
     }
 }

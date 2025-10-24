@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { BadRequestException, INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -13,6 +13,33 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({
+      transform: true,
+      exceptionFactory(errors) {
+        const formattedErrors = {}
+
+        errors.forEach((error) => {
+          if (error.constraints) {
+            formattedErrors[error.property] = Object.values(error.constraints)[0];
+          }
+
+          if (error.children && error.children.length > 0) {
+            error.children.forEach((child) => {
+              if (child.constraints) {
+                formattedErrors[`${error.property}.${child.property}`] =
+                  Object.values(child.constraints)[0];
+              }
+            });
+          }
+        });
+
+        return new BadRequestException({
+          status: 400,
+          message: 'validation exception',
+          error: formattedErrors,
+        });
+      },
+    }))
     await app.init();
   });
 
@@ -20,14 +47,156 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  it('/user (GET)', async () => {
-    const response = await request(app.getHttpServer()).get("/user")
+  let jwt: string;
+
+  it("/auth/login (POST) 200 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/auth/login").send({
+      email: "user@gmail.com",
+      password: "Userpassword123!"
+    })
     expect(response.status).toBe(200)
-    expect(response.body[0]).toHaveProperty("id")
-    expect(response.body[0]).toHaveProperty("name")
-    expect(response.body[0]).toHaveProperty("email")
-    expect(response.body[0]).toHaveProperty("password")
-    expect(response.body[0]).toHaveProperty("created_at")
-    expect(response.body[0]).toHaveProperty("updated_at")
+    expect(response.body.data).toHaveProperty("access_token")
+    jwt = response.body.data.access_token
+  })
+
+  it("/auth/login (POST) 400 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/auth/login")
+    expect(response.status).toBe(400)
+    expect(response.body).toHaveProperty("status")
+    expect(response.body).toHaveProperty("message")
+    expect(response.body).toHaveProperty("error")
+    expect(typeof response.body.error).toEqual("object")
+  })
+
+  it("/auth/login (POST) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/auth/login").send({
+      email: "user@gmail.com",
+      password: "userPassword123!"
+    })
+    expect(response.status).toBe(401)
+  })
+
+  it('/auth/register (POST) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).post("/auth/register").send({
+      name: "Tsaqif",
+      email: "tsaqifradhitya@gmail.com",
+      password: "Tsaqif10!",
+      confirm_password: "Tsaqif10!"
+    })
+    expect(response.status).toBe(201)
+    expect(response.body).toHaveProperty("status")
+    expect(response.body).toHaveProperty("message")
+    expect(response.body).toHaveProperty("data")
+    expect(typeof response.body.data).toEqual("object")
+  })
+
+  it('/auth/register (POST) 400 condition', async () => {
+    const response = await request(app.getHttpServer()).post("/auth/register")
+    expect(response.status).toBe(400)
+    expect(response.body).toHaveProperty("status")
+    expect(response.body).toHaveProperty("message")
+    expect(response.body).toHaveProperty("error")
+    expect(typeof response.body.error).toEqual("object")
+  })
+
+  it("/auth/activate_account (POST) 200 condition", async () => {
+
+  })
+
+  it("/auth/activate_account (POST) 400 condition", async () => {
+
+  })
+
+  it("/auth/activate_account (POST) 401 condition", async () => {
+
+  })
+
+  it("/auth/disable_account (POST) 200 condition", async () => {
+
+  })
+
+  it("/auth/disable_account (POST) 401 condition", async () => {
+
+  })
+
+  it('/user (GET) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/user").set('Authorization' as any, `Bearer ${jwt}`)
+    expect(response.status).toBe(200)
+  })
+
+  it('/user (GET) 401 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/user")
+    expect(response.status).toBe(401)
+  })
+
+  it('/user/saldo (GET) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/user/saldo").set('Authorization' as any, `Bearer ${jwt}`)
+    expect(response.status).toBe(200)
+    expect(typeof response.body.data.saldo === "number").toBe(true)
+  })
+
+  it('/user/saldo (GET) 401 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/user/saldo")
+    expect(response.status).toBe(401)
+  })
+
+  it('/user (PATCH) 200 condition', async () => {
+
+  })
+
+  it('/user (PATCH) 400', async () => {
+
+  })
+
+  it('/user (PATCH) 403', async () => {
+
+  })
+
+  it('/user/update_password (POST) 200 condition', async () => {
+
+  })
+
+  it('/user/update_password (POST) 400 condition', async () => {
+
+  })
+
+  it('/user/update_password (POST) 400 condition (new password same with old password)', async () => {
+
+  })
+
+  it('/user/update_password (POST) 401 condition', async () => {
+
+  })
+
+  it("/mutation (POST) 200 condition", async () => {
+
+  })
+
+  it("/mutation (POST) 400 condition", async () => {
+
+  })
+
+  it("/mutation (POST) 403 condition", async () => {
+
+  })
+
+  it("/mutation (GET) 200 condition", async () => {
+
+  })
+
+  it("/mutation (GET) 401 condition", async () => {
+
+  })
+
+  it("/mutation/:id (GET) 200 condition", async () => {
+
+  })
+
+  it("/mutation/:id (GET) 404 condition", async () => {
+
+  })
+
+  it("/mutation/:id (GET) 403 condition", async () => {
+
   })
 });
