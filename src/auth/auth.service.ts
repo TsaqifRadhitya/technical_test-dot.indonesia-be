@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { RegisterDTO } from './dto/register.dto';
@@ -6,9 +6,12 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
+
+    invalidate_jwt: string[] = []
 
     constructor(@InjectRepository(User) private userRepository: Repository<User>, private usersService: UserService, private jwtService: JwtService) {
 
@@ -29,6 +32,14 @@ export class AuthService {
         };
     }
 
+    logout(token: string) {
+        const invalidated_jwt_check = !!this.invalidate_jwt.find((jwt) => jwt === token)
+        if (invalidated_jwt_check) {
+            throw new UnauthorizedException()
+        }
+        this.invalidate_jwt = [...this.invalidate_jwt, token]
+    }
+
     async register(data: RegisterDTO) {
         const hashedPassword = await bcrypt.hash(data.password, 10)
         try {
@@ -46,5 +57,29 @@ export class AuthService {
                 },
             })
         }
+    }
+
+    isInvalidate_jwt(token: string) {
+        return !!this.invalidate_jwt.find((jwt) => jwt === token)
+    }
+
+    async disableAccount(userId: number) {
+        await this.userRepository.softDelete({
+            id: userId
+        })
+    }
+
+    async enableAccount(data: LoginDTO) {
+        const user = await this.userRepository.findOne({
+            where: {
+                email: data.email
+            },
+            withDeleted: true
+        });
+        if (!(user && await bcrypt.compare(data.password, user.password))) {
+            throw new UnauthorizedException()
+        }
+
+        await this.userRepository.softRemove(user)
     }
 }

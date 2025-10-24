@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -15,14 +15,24 @@ export class AuthController {
 
     @UseGuards(LocalAuthGuard)
     @Post("login")
-    async login(@Body() body: LoginDTO, @Request() req) {
-        return this.authService.login(req.user)
+    async login(@Body() body: LoginDTO, @Req() req, @Res() res: Response) {
+        const data = await this.authService.login(req.user)
+        return res.status(200).json({
+            status: 200,
+            message: "ok",
+            data
+        })
     }
 
-    @UseGuards(LocalAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Post('logout')
-    async logout(@Request() req) {
-        return req.logout();
+    async logout(@Req() req: Request, @Res() res: Response) {
+        const bearerToken = req.headers.authorization?.split(" ")[1]
+        this.authService.logout(bearerToken as string)
+        return res.status(200).json({
+            status: 200,
+            message: "ok"
+        })
     }
 
     @Post("register")
@@ -40,13 +50,21 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Delete("disable_account")
-    async disableAccount(@Request() req) {
+    async disableAccount(@Req() req, @Res() res: Response) {
         const { userId } = req.user
+        await this.authService.disableAccount(userId)
+        return res.status(200).json({
+            status: 200,
+            message: "ok"
+        })
     }
 
-    @UseGuards(LocalAuthGuard)
     @Post("activate_account")
-    async enableAccount(@Body() body: LoginDTO, @Request() req) {
-
+    async enableAccount(@Body() body: LoginDTO, @Req() req, @Res() res: Response) {
+        await this.authService.enableAccount(body)
+        return res.status(200).json({
+            status: 200,
+            message: "ok"
+        })
     }
 }

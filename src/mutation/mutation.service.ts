@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMutationDto } from './dto/create-mutation.dto';
 import { UpdateMutationDto } from './dto/update-mutation.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Mutation } from './entities/mutation.entity';
+import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class MutationService {
-  create(createMutationDto: CreateMutationDto) {
-    return 'This action adds a new mutation';
+
+  constructor(@InjectRepository(Mutation) private mutationRepository: Repository<Mutation>) {
+
   }
 
-  findAll() {
-    return `This action returns all mutation`;
+  async show(id: number, userId: number) {
+    const data = await this.findOne({
+      id: id,
+      user: {
+        id: userId
+      }
+    });
+
+    if (!data) {
+      throw new NotFoundException()
+    }
+
+    return data
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} mutation`;
+  async create(userId: number, data: CreateMutationDto) {
+    return this.mutationRepository.insert({
+      ...CreateMutationDto,
+      user: {
+        id: userId
+      }
+    });
   }
 
-  update(id: number, updateMutationDto: UpdateMutationDto) {
-    return `This action updates a #${id} mutation`;
+  async findAll(option?: FindManyOptions<Mutation>) {
+    return this.mutationRepository.find({
+      ...option
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} mutation`;
+  findOne(option: FindOptionsWhere<Mutation>) {
+    return this.mutationRepository.findOne({
+      where: option
+    })
   }
 }
