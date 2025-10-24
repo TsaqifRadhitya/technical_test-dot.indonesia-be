@@ -13,11 +13,13 @@ export class UserController {
   @Get()
   async index(@Request() req, @Res() res: Response) {
     const { userId } = req.user
-    const response = await this.userService.findOne({ where: { id: userId } })
+    const response = await this.userService.findOne({
+      where: { id: userId }
+    })
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
-      data: response
+      data: { ...response, password: undefined }
     })
   }
 
@@ -27,7 +29,7 @@ export class UserController {
     const { userId } = req.user
     const response = await this.userService.update(userId, updateUserDto);
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
       data: response
     })
@@ -38,7 +40,7 @@ export class UserController {
     const { userId } = req.user
     await this.userService.updatePassword(userId, updateUserDto)
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
     })
   }
@@ -48,7 +50,7 @@ export class UserController {
     const { userId } = req.user
     const saldo = await this.userService.getSaldo(userId)
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
       data: {
         saldo

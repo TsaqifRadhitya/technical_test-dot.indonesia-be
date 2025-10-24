@@ -14,20 +14,21 @@ export class MutationController {
     const { userId } = req.user
     const createdData = await this.mutationService.create(userId, createMutationDto)
     return res.status(201).json({
-      status: 201,
+      statusCode: 201,
       message: "created",
-      data: createdData
+      data: { ...createdData, user: undefined, user_id: createdData.user.id }
     })
   }
 
   @Get()
-  async findAll(@Req() req, @Res() res: Response, @Query('perpage') perpage: number, @Query('page') page: number) {
+  async index(@Req() req, @Res() res: Response, @Query('perpage') perpage = 10, @Query('page') page = 1) {
     const { userId } = req.user
-    const mutationsUserData = await this.mutationService.findAll(userId)
+    const { data, metadata } = await this.mutationService.index(userId, page, perpage)
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
-      data: mutationsUserData
+      data,
+      metadata
     })
   }
 
@@ -36,7 +37,7 @@ export class MutationController {
     const { userId } = req.user
     const mutationData = await this.mutationService.show(id, userId)
     return res.status(200).json({
-      status: 200,
+      statusCode: 200,
       message: "ok",
       data: mutationData
     })

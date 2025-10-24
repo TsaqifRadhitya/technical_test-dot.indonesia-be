@@ -78,14 +78,9 @@ export class AuthService {
     }
 
     async disableAccount(userId: number) {
-        const sessions = await this.sessionRepository.find({
-            where: {
-                user: {
-                    id: userId
-                }
-            }
-        })
-        await this.sessionRepository.delete(sessions)
+        await this.sessionRepository.delete({
+            user: { id: userId }
+        });
         await this.usersService.softDelete(userId)
     }
 

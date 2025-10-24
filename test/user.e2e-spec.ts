@@ -22,7 +22,6 @@ describe("mutation module (e2e)", () => {
     let invalid_password: string;
 
     beforeAll(async () => {
-
         name = faker.person.fullName()
         current_email = faker.internet.email()
         current_password = [faker.string.alpha({ length: 1, casing: 'upper' }), faker.string.alpha({ length: 1, casing: 'lower' }), faker.string.numeric({ length: 1 }), faker.string.symbol(), faker.string.alphanumeric({ length: 4 })].join("")
@@ -57,8 +56,8 @@ describe("mutation module (e2e)", () => {
                 });
 
                 return new BadRequestException({
-                    status: 400,
-                    message: 'validation exception',
+                    statusCode: 400,
+                    message: "Bad Request",
                     error: formattedErrors,
                 });
             },
@@ -124,6 +123,11 @@ describe("mutation module (e2e)", () => {
         const response = await request(app.getHttpServer()).patch("/api/user").set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
             email: "sdaadad"
         })
+        expect(response.status).toBe(400)
+    })
+
+    it('/api/user (PATCH) 400 (all field empty)', async () => {
+        const response = await request(app.getHttpServer()).patch("/api/user").set('Authorization' as any, `Bearer ${sessional_jwt}`)
         expect(response.status).toBe(400)
     })
 

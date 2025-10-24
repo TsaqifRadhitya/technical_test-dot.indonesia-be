@@ -13,7 +13,6 @@ describe("Auth Module (e2e)", () => {
     let sessional_jwt: string;
     let jwt: string;
 
-
     beforeAll(async () => {
         name = faker.person.fullName()
         current_email = faker.internet.email()
@@ -45,8 +44,8 @@ describe("Auth Module (e2e)", () => {
                 });
 
                 return new BadRequestException({
-                    status: 400,
-                    message: 'validation exception',
+                    statusCode: 400,
+                    message: "Bad Request",
                     error: formattedErrors,
                 });
             },
@@ -72,7 +71,7 @@ describe("Auth Module (e2e)", () => {
     it("/api/auth/login (POST) 400 condition", async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/login").send({})
         expect(response.status).toBe(400)
-        expect(response.body).toHaveProperty("status")
+        expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("error")
         expect(typeof response.body.error).toEqual("object")
@@ -94,7 +93,7 @@ describe("Auth Module (e2e)", () => {
             confirm_password: current_password
         })
         expect(response.status).toBe(201)
-        expect(response.body).toHaveProperty("status")
+        expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("data")
         expect(typeof response.body.data).toEqual("object")
@@ -103,7 +102,7 @@ describe("Auth Module (e2e)", () => {
     it('/api/auth/register (POST) 400 condition', async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/register")
         expect(response.status).toBe(400)
-        expect(response.body).toHaveProperty("status")
+        expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("error")
         expect(typeof response.body.error).toEqual("object")

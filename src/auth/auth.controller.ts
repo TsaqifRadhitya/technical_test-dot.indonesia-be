@@ -18,7 +18,7 @@ export class AuthController {
     async login(@Body() body: LoginDTO, @Req() req, @Res() res: Response) {
         const data = await this.authService.login(req.user)
         return res.status(200).json({
-            status: 200,
+            statusCode: 200,
             message: "ok",
             data
         })
@@ -30,7 +30,7 @@ export class AuthController {
         const bearerToken = req.headers.authorization?.split(" ")[1]
         this.authService.logout(bearerToken as string)
         return res.status(200).json({
-            status: 200,
+            stastatusCodetus: 200,
             message: "ok"
         })
     }
@@ -39,7 +39,7 @@ export class AuthController {
     async register(@Body() registerDTO: RegisterDTO, @Res() res: Response) {
         const response = await this.authService.register(registerDTO)
         return res.status(201).json({
-            status: 201,
+            statusCode: 201,
             message: "created",
             data: {
                 ...response,
@@ -54,7 +54,7 @@ export class AuthController {
         const { userId } = req.user
         await this.authService.disableAccount(userId)
         return res.status(200).json({
-            status: 200,
+            statusCode: 200,
             message: "ok"
         })
     }
@@ -63,7 +63,7 @@ export class AuthController {
     async enableAccount(@Body() body: LoginDTO, @Req() req, @Res() res: Response) {
         await this.authService.enableAccount(body)
         return res.status(200).json({
-            status: 200,
+            statusCode: 200,
             message: "ok"
         })
     }

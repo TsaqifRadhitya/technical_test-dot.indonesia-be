@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -15,13 +15,33 @@ export class UserService {
 
   findOne(option: FindOneOptions<User>) {
     return this.userRepository.findOne(option)
-  }
+}
 
-  update(id: number, updateUserDto: Partial<User>) {
-    return this.userRepository.update({
-      id: id
-    }, {
-      email: updateUserDto.email
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    if (!updateUserDto.email && !updateUserDto.name) {
+      throw new BadRequestException({
+        statusCode: 400,
+        message: "Bad Request",
+        error: {
+          name: ["name is required if other field is empty"],
+          email: ["email is required if other field is empty"],
+        }
+      })
+    }
+
+    await this.userRepository.save({
+      id: id,
+      ...updateUserDto
+    })
+
+    return this.userRepository.findOne({
+      where: { id: id }, select: {
+        email: true,
+        created_at: true,
+        id: true,
+        name: true,
+        updated_at: true
+      }
     })
   }
 
@@ -61,9 +81,11 @@ export class UserService {
       throw new UnauthorizedException()
     }
 
-    await this.userRepository.update(
-      { id: userId },
-      { password: newPassword }
+    await this.userRepository.save(
+      {
+        id: userId,
+        password: newPassword
+      }
     );
   }
 
@@ -76,6 +98,6 @@ export class UserService {
   }
 
   async create(data: Partial<User>) {
-    return this.userRepository.insert(data)
+    return this.userRepository.save(data)
   }
 }

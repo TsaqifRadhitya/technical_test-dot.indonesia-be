@@ -27,8 +27,8 @@ export class LocalAuthGuard extends AuthGuard('local') {
                 }
             });
             throw new BadRequestException({
-                status: 400,
-                message: 'validation exception',
+                statusCode: 400,
+                message: "Bad Request",
                 error: formattedErrors,
             });
         }
