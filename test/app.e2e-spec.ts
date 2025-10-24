@@ -40,6 +40,7 @@ describe('AppController (e2e)', () => {
         });
       },
     }))
+    app.setGlobalPrefix('api')
     await app.init();
   });
 
@@ -49,8 +50,8 @@ describe('AppController (e2e)', () => {
 
   let jwt: string;
 
-  it("/auth/login (POST) 200 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/login").send({
+  it("/api/auth/login (POST) 200 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/login").send({
       email: "tsaqifradhitya@gmail.com",
       password: "Tsaqif10!"
     })
@@ -59,8 +60,8 @@ describe('AppController (e2e)', () => {
     jwt = response.body.data.access_token
   })
 
-  it("/auth/login (POST) 400 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/login").send({})
+  it("/api/auth/login (POST) 400 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/login").send({})
     expect(response.status).toBe(400)
     expect(response.body).toHaveProperty("status")
     expect(response.body).toHaveProperty("message")
@@ -68,16 +69,16 @@ describe('AppController (e2e)', () => {
     expect(typeof response.body.error).toEqual("object")
   })
 
-  it("/auth/login (POST) 401 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/login").send({
+  it("/api/auth/login (POST) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/login").send({
       email: "user@gmail.com",
       password: "userPassword123!"
     })
     expect(response.status).toBe(401)
   })
 
-  it('/auth/register (POST) 200 condition', async () => {
-    const response = await request(app.getHttpServer()).post("/auth/register").send({
+  it('/api/auth/register (POST) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/register").send({
       name: "Tsaqif",
       email: "tsaqifradhitya@gmail.com",
       password: "Tsaqif10!",
@@ -90,8 +91,8 @@ describe('AppController (e2e)', () => {
     expect(typeof response.body.data).toEqual("object")
   })
 
-  it('/auth/register (POST) 400 condition', async () => {
-    const response = await request(app.getHttpServer()).post("/auth/register")
+  it('/api/auth/register (POST) 400 condition', async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/register")
     expect(response.status).toBe(400)
     expect(response.body).toHaveProperty("status")
     expect(response.body).toHaveProperty("message")
@@ -99,125 +100,125 @@ describe('AppController (e2e)', () => {
     expect(typeof response.body.error).toEqual("object")
   })
 
-  it("/auth/activate_account (POST) 200 condition", async () => {
+  it("/api/auth/activate_account (POST) 200 condition", async () => {
 
   })
 
-  it("/auth/activate_account (POST) 400 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/activate_account")
+  it("/api/auth/activate_account (POST) 400 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/activate_account")
     expect(response.status).toBe(400)
   })
 
-  it("/auth/activate_account (POST) 401 condition", async () => {
+  it("/api/auth/activate_account (POST) 401 condition", async () => {
 
   })
 
-  it("/auth/disable_account (POST) 200 condition", async () => {
+  it("/api/auth/disable_account (POST) 200 condition", async () => {
 
   })
 
-  it("/auth/disable_account (POST) 401 condition", async () => {
-    const response = await request(app.getHttpServer()).delete("/auth/disable_account")
+  it("/api/auth/disable_account (POST) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).delete("/api/auth/disable_account")
     expect(response.status).toBe(401)
   })
 
-  it('/user (GET) 200 condition', async () => {
-    const response = await request(app.getHttpServer()).get("/user").set('Authorization' as any, `Bearer ${jwt}`)
+  it('/api/user (GET) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/api/user").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(200)
   })
 
-  it('/user (GET) 401 condition', async () => {
-    const response = await request(app.getHttpServer()).get("/user")
+  it('/api/user (GET) 401 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/api/user")
     expect(response.status).toBe(401)
   })
 
-  it('/user/saldo (GET) 200 condition', async () => {
-    const response = await request(app.getHttpServer()).get("/user/saldo").set('Authorization' as any, `Bearer ${jwt}`)
+  it('/api/user/saldo (GET) 200 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/api/user/saldo").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(200)
     expect(typeof response.body.data.saldo === "number").toBe(true)
   })
 
-  it('/user/saldo (GET) 401 condition', async () => {
-    const response = await request(app.getHttpServer()).get("/user/saldo")
+  it('/api/user/saldo (GET) 401 condition', async () => {
+    const response = await request(app.getHttpServer()).get("/api/user/saldo")
     expect(response.status).toBe(401)
   })
 
-  it('/user (PATCH) 200 condition', async () => {
+  it('/api/user (PATCH) 200 condition', async () => {
 
   })
 
-  it('/user (PATCH) 400', async () => {
+  it('/api/user (PATCH) 400', async () => {
 
   })
 
-  it('/user (PATCH) 401', async () => {
-    const response = await request(app.getHttpServer()).patch("/user")
+  it('/api/user (PATCH) 401', async () => {
+    const response = await request(app.getHttpServer()).patch("/api/user")
     expect(response.status).toBe(401)
   })
 
-  it('/user/update_password (POST) 200 condition', async () => {
+  it('/api/user/update_password (POST) 200 condition', async () => {
 
   })
 
-  it('/user/update_password (POST) 400 condition', async () => {
+  it('/api/user/update_password (POST) 400 condition', async () => {
 
   })
 
-  it('/user/update_password (POST) 400 condition (new password same with old password)', async () => {
+  it('/api/user/update_password (POST) 400 condition (new password same with old password)', async () => {
 
   })
 
-  it('/user/update_password (POST) 401 condition', async () => {
-    const response = await request(app.getHttpServer()).post("/user/update_password")
+  it('/api/user/update_password (POST) 401 condition', async () => {
+    const response = await request(app.getHttpServer()).post("/api/user/update_password")
     expect(response.status).toBe(401)
   })
 
-  it("/mutation (POST) 200 condition", async () => {
+  it("/api/mutation (POST) 200 condition", async () => {
 
   })
 
-  it("/mutation (POST) 400 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/mutation").set('Authorization' as any, `Bearer ${jwt}`)
+  it("/api/mutation (POST) 400 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/mutation").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(400)
   })
 
-  it("/mutation (POST) 401 condition", async () => {
-    const response = await request(app.getHttpServer()).post("/mutation")
+  it("/api/mutation (POST) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).post("/api/mutation")
     expect(response.status).toBe(401)
   })
 
-  it("/mutation (GET) 200 condition", async () => {
-    const response = await request(app.getHttpServer()).get("/mutation").set('Authorization' as any, `Bearer ${jwt}`)
+  it("/api/mutation (GET) 200 condition", async () => {
+    const response = await request(app.getHttpServer()).get("/api/mutation").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(200)
   })
 
-  it("/mutation (GET) 401 condition", async () => {
-    const response = await request(app.getHttpServer()).get("/mutation")
+  it("/api/mutation (GET) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).get("/api/mutation")
     expect(response.status).toBe(401)
   })
 
-  it("/mutation/:id (GET) 200 condition", async () => {
-    const response = await request(app.getHttpServer()).get("/mutation/1").set('Authorization' as any, `Bearer ${jwt}`)
+  it("/api/mutation/:id (GET) 200 condition", async () => {
+    const response = await request(app.getHttpServer()).get("/api/mutation/1").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(200)
   })
 
-  it("/mutation/:id (GET) 404 condition", async () => {
-    const response = await request(app.getHttpServer()).get("/mutation/100").set('Authorization' as any, `Bearer ${jwt}`)
+  it("/api/mutation/:id (GET) 404 condition", async () => {
+    const response = await request(app.getHttpServer()).get("/api/mutation/100").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(404)
   })
 
-  it("/mutation/:id (GET) 401 condition", async () => {
-    const response = await request(app.getHttpServer()).get("/mutation/1")
+  it("/api/mutation/:id (GET) 401 condition", async () => {
+    const response = await request(app.getHttpServer()).get("/api/mutation/1")
     expect(response.status).toBe(401)
   })
 
-  it("/auth/logout (POST) condition 200", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/logout").set('Authorization' as any, `Bearer ${jwt}`)
+  it("/api/auth/logout (POST) condition 200", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/logout").set('Authorization' as any, `Bearer ${jwt}`)
     expect(response.status).toBe(200)
   })
 
-  it("/auth/logout (POST) condition 401", async () => {
-    const response = await request(app.getHttpServer()).post("/auth/logout")
+  it("/api/auth/logout (POST) condition 401", async () => {
+    const response = await request(app.getHttpServer()).post("/api/auth/logout")
     expect(response.status).toBe(401)
   })
 });
