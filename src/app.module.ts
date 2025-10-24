@@ -19,7 +19,8 @@ import { ConfigModule } from '@nestjs/config';
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
       database: process.env.DB_NAME || "nestjs",
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV === "production" ? false : true
+      synchronize: process.env.NODE_ENV === "production" ? false : true,
+      keepAlive: true
     }), AuthModule],
   controllers: [AppController],
   providers: [AppService],

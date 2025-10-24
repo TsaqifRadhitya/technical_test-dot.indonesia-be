@@ -7,6 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
+    whitelist: true,
     exceptionFactory(errors) {
       const formattedErrors = {}
 
@@ -23,6 +24,8 @@ async function bootstrap() {
           });
         }
       });
+
+      app
 
       return new BadRequestException({
         status: 400,

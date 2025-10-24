@@ -3,7 +3,7 @@ import { registerDecorator, ValidationArguments, ValidationOptions } from 'class
 export function IsDifferentTo(property: string, validationOptions?: ValidationOptions) {
     return function (object: Object, propertyName: string) {
         registerDecorator({
-            name: 'IsEqualTo',
+            name: 'IsDifferentTo',
             target: object.constructor,
             propertyName,
             options: validationOptions,

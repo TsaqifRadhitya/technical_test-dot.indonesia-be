@@ -13,7 +13,7 @@ export class UserController {
   @Get()
   async index(@Request() req, @Res() res: Response) {
     const { userId } = req.user
-    const response = await this.userService.findOne({ id: userId })
+    const response = await this.userService.findOne({ where: { id: userId } })
     return res.status(200).json({
       status: 200,
       message: "ok",

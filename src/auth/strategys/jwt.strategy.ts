@@ -18,9 +18,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     async validate(req: Request, payload) {
         const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-        if (this.authService.isInvalidate_jwt(token as string)) {
-            throw new UnauthorizedException()
+        if (await this.authService.isValid_jwt(token as string)) {
+            return { userId: payload.sub, email: payload.email };
         }
-        return { userId: payload.sub, email: payload.email };
+        throw new UnauthorizedException()
     }
 }

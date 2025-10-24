@@ -1,14 +1,10 @@
-import { IsNumber, IsEnum } from "class-validator";
-
-enum transaction_type_enum {
-    DEPOSIT = 'deposit',
-    WITHDRAW = 'withdraw'
-}
+import { IsNumber, IsIn, IsString } from "class-validator";
 
 export class CreateMutationDto {
     @IsNumber()
     amount: number
 
-    @IsEnum(transaction_type_enum)
+    @IsString()
+    @IsIn(['deposit', 'withdraw'])
     transaction_type: string
 }

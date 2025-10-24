@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMutationDto } from './dto/create-mutation.dto';
-import { UpdateMutationDto } from './dto/update-mutation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mutation } from './entities/mutation.entity';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
@@ -29,7 +28,8 @@ export class MutationService {
 
   async create(userId: number, data: CreateMutationDto) {
     return this.mutationRepository.insert({
-      ...CreateMutationDto,
+      amount: data.amount,
+      transaction_type: data.transaction_type as any,
       user: {
         id: userId
       }

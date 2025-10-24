@@ -8,7 +8,7 @@ import { validate } from 'class-validator';
 export class LocalAuthGuard extends AuthGuard('local') {
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest();
-        const dto = plainToInstance(LoginDTO, request.body)
+        const dto = plainToInstance(LoginDTO, request.body || {})
         const errors = await validate(dto)
 
         if (errors.length > 0) {

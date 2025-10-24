@@ -1,3 +1,4 @@
+import { Session } from "../../auth/entities/session.entity";
 import { Mutation } from "../../mutation/entities/mutation.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -27,4 +28,6 @@ export class User {
     @OneToMany(() => Mutation, (mutation) => mutation.user)
     mutations: Mutation[]
 
+    @OneToMany(() => Session, (session) => session.user)
+    sessions: Session[]
 }

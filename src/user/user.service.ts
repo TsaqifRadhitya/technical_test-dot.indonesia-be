@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -13,16 +13,16 @@ export class UserService {
 
   }
 
-  findOne(option: FindOptionsWhere<User>) {
-    return this.userRepository.findOne({
-      where: option
-    })
+  findOne(option: FindOneOptions<User>) {
+    return this.userRepository.findOne(option)
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto: Partial<User>) {
     return this.userRepository.update({
       id: id
-    }, updateUserDto)
+    }, {
+      email: updateUserDto.email
+    })
   }
 
   remove(id: number) {
@@ -51,10 +51,31 @@ export class UserService {
 
   async updatePassword(userId: number, newData: UpdatePasswordDTO) {
     const newPassword = await bcrypt.hash(newData.new_password, 10)
-    await this.userRepository.update({
-      id: userId
-    }, {
-      password: newPassword
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId
+      }
     })
+
+    if (!(await bcrypt.compare(newData.current_password, user!.password))) {
+      throw new UnauthorizedException()
+    }
+
+    await this.userRepository.update(
+      { id: userId },
+      { password: newPassword }
+    );
+  }
+
+  async restoreSoftDelete(id: number) {
+    return this.userRepository.restore(id)
+  }
+
+  async softDelete(id: number) {
+    return await this.userRepository.softDelete(id)
+  }
+
+  async create(data: Partial<User>) {
+    return this.userRepository.insert(data)
   }
 }
