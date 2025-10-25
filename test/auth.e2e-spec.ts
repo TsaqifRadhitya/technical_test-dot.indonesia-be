@@ -64,7 +64,13 @@ describe("Auth Module (e2e)", () => {
             password: "Tsaqif10!"
         })
         expect(response.status).toBe(200)
-        expect(response.body.data).toHaveProperty("access_token")
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        expect(response.body).toHaveProperty('data')
+        const { statusCode, message, data } = response.body
+        expect(statusCode).toBe(200)
+        expect(message).toBe("ok")
+        expect(data).toHaveProperty('access_token')
         jwt = response.body.data.access_token
     })
 
@@ -74,7 +80,19 @@ describe("Auth Module (e2e)", () => {
         expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("error")
-        expect(typeof response.body.error).toEqual("object")
+        const { statusCode, message, error } = response.body
+        expect(statusCode).toBe(400)
+        expect(message).toBe("Bad Request")
+        expect(error).toHaveProperty('email');
+        expect(error).toHaveProperty('password');
+
+        (error.email as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
+
+        (error.password as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
     })
 
     it("/api/auth/login (POST) 401 condition", async () => {
@@ -83,6 +101,11 @@ describe("Auth Module (e2e)", () => {
             password: "userPassword123!"
         })
         expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(401)
+        expect(message).toBe("Unauthorized")
     })
 
     it('/api/auth/register (POST) 201 condition', async () => {
@@ -96,7 +119,15 @@ describe("Auth Module (e2e)", () => {
         expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("data")
-        expect(typeof response.body.data).toEqual("object")
+        const { statusCode, message, data } = response.body
+        expect(statusCode).toBe(201)
+        expect(message).toBe("created")
+        expect(data).toHaveProperty('id')
+        expect(data).toHaveProperty("name")
+        expect(data).toHaveProperty("email")
+        expect(data).toHaveProperty("created_at")
+        expect(data).toHaveProperty("updated_at")
+
     })
 
     it('/api/auth/register (POST) 400 condition', async () => {
@@ -105,7 +136,29 @@ describe("Auth Module (e2e)", () => {
         expect(response.body).toHaveProperty("statusCode")
         expect(response.body).toHaveProperty("message")
         expect(response.body).toHaveProperty("error")
-        expect(typeof response.body.error).toEqual("object")
+        const { statusCode, message, error } = response.body
+        expect(statusCode).toBe(400)
+        expect(message).toBe("Bad Request")
+        expect(error).toHaveProperty('name');
+        expect(error).toHaveProperty('email');
+        expect(error).toHaveProperty('password');
+        expect(error).toHaveProperty('confirm_password');
+
+        (error.name as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
+
+        (error.email as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
+
+        (error.password as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
+
+        (error.confirm_password as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
     })
 
     it("/api/auth/login (POST) 200 condition (new account)", async () => {
@@ -114,28 +167,54 @@ describe("Auth Module (e2e)", () => {
             password: current_password
         })
         expect(response.status).toBe(200)
-        expect(response.body.data).toHaveProperty("access_token")
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        expect(response.body).toHaveProperty('data')
+        const { statusCode, message, data } = response.body
+        expect(statusCode).toBe(200)
+        expect(message).toBe("ok")
+        expect(data).toHaveProperty('access_token')
         sessional_jwt = response.body.data.access_token
     })
 
     it("/api/auth/logout (POST) condition 200", async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/logout").set('Authorization' as any, `Bearer ${jwt}`)
         expect(response.status).toBe(200)
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(200)
+        expect(message).toBe("ok")
     })
 
     it("/api/auth/logout (POST) condition 401", async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/logout")
         expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(401)
+        expect(message).toBe("Unauthorized")
     })
 
     it("/api/auth/disable_account (POST) 200 condition", async () => {
         const response = await request(app.getHttpServer()).delete("/api/auth/disable_account").set('Authorization' as any, `Bearer ${sessional_jwt}`)
         expect(response.status).toBe(200)
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(200)
+        expect(message).toBe("ok")
     })
 
     it("/api/auth/disable_account (POST) 401 condition", async () => {
         const response = await request(app.getHttpServer()).delete("/api/auth/disable_account")
         expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(401)
+        expect(message).toBe("Unauthorized")
     })
 
     it("/api/auth/activate_account (POST) 200 condition", async () => {
@@ -144,6 +223,11 @@ describe("Auth Module (e2e)", () => {
             password: current_password
         })
         expect(response.status).toBe(200)
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(200)
+        expect(message).toBe("ok")
     })
 
     it("/api/auth/activate_account (POST) 401 condition", async () => {
@@ -152,6 +236,11 @@ describe("Auth Module (e2e)", () => {
             password: "Tsaqif10!!"
         })
         expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(401)
+        expect(message).toBe("Unauthorized")
     })
 
     it("/api/auth/activate_account (POST) 409 condition", async () => {
@@ -160,10 +249,31 @@ describe("Auth Module (e2e)", () => {
             password: current_password
         })
         expect(response.status).toBe(409)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        const { statusCode, message } = response.body
+        expect(statusCode).toBe(409)
+        expect(message).toBe("Conflict")
     })
 
     it("/api/auth/activate_account (POST) 400 condition", async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/activate_account")
         expect(response.status).toBe(400)
+        expect(response.body).toHaveProperty("statusCode")
+        expect(response.body).toHaveProperty("message")
+        expect(response.body).toHaveProperty("error")
+        const { statusCode, message, error } = response.body
+        expect(statusCode).toBe(400)
+        expect(message).toBe("Bad Request")
+        expect(error).toHaveProperty('email');
+        expect(error).toHaveProperty('password');
+
+        (error.email as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
+
+        (error.password as string[]).forEach((err) => {
+            expect(typeof err).toBe("string");
+        });
     })
 })
