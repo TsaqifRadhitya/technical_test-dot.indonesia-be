@@ -30,7 +30,7 @@ export class AuthController {
         const bearerToken = req.headers.authorization?.split(" ")[1]
         this.authService.logout(bearerToken as string)
         return res.status(200).json({
-            stastatusCodetus: 200,
+            statusCode: 200,
             message: "ok"
         })
     }
