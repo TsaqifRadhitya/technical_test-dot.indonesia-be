@@ -57,7 +57,7 @@ describe("mutation module (e2e)", () => {
         app.close()
     })
 
-    it("/api/mutation (POST) 200 condition", async () => {
+    it("/api/mutation (POST) 201 condition", async () => {
         const response = await request(app.getHttpServer()).post("/api/mutation").set('Authorization' as any, `Bearer ${jwt}`).send({
             amount: 50000,
             transaction_type: "deposit"

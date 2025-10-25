@@ -15,7 +15,7 @@ export class UserService {
 
   findOne(option: FindOneOptions<User>) {
     return this.userRepository.findOne(option)
-}
+  }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (!updateUserDto.email && !updateUserDto.name) {

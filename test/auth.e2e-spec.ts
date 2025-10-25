@@ -85,7 +85,7 @@ describe("Auth Module (e2e)", () => {
         expect(response.status).toBe(401)
     })
 
-    it('/api/auth/register (POST) 200 condition', async () => {
+    it('/api/auth/register (POST) 201 condition', async () => {
         const response = await request(app.getHttpServer()).post("/api/auth/register").send({
             name: name,
             email: current_email,
