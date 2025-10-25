@@ -94,6 +94,9 @@ describe("mutation module (e2e)", () => {
     it('/api/user (GET) 200 condition', async () => {
         const response = await request(app.getHttpServer()).get("/api/user").set('Authorization' as any, `Bearer ${jwt}`)
         expect(response.status).toBe(200)
+        expect(response.body).toHaveProperty('statusCode')
+        expect(response.body).toHaveProperty('message')
+        expect(response.body).toHaveProperty('data')
         const { statusCode, message, data } = response.body
         expect(statusCode).toBe(200)
         expect(message).toBe("ok")

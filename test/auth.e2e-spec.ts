@@ -30,7 +30,7 @@ describe("Auth Module (e2e)", () => {
 
                 errors.forEach((error) => {
                     if (error.constraints) {
-                        formattedErrors[error.property] = Object.values(error.constraints)[0];
+                        formattedErrors[error.property] = Object.values(error.constraints);
                     }
 
                     if (error.children && error.children.length > 0) {

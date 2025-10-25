@@ -3,6 +3,7 @@ import { MutationService } from './mutation.service';
 import { CreateMutationDto } from './dto/create-mutation.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { Response } from 'express';
+import { GetMutationQueryDTO } from './dto/get-mutation.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('mutation')
@@ -21,9 +22,9 @@ export class MutationController {
   }
 
   @Get()
-  async index(@Req() req, @Res() res: Response, @Query('perpage') perpage = 10, @Query('page') page = 1) {
+  async index(@Req() req, @Res() res: Response, @Query() query: GetMutationQueryDTO) {
     const { userId } = req.user
-    const { data, metadata } = await this.mutationService.index(userId, page, perpage)
+    const { data, metadata } = await this.mutationService.index(userId, query.page, query.limit)
     return res.status(200).json({
       statusCode: 200,
       message: "ok",
