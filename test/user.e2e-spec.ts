@@ -216,6 +216,26 @@ describe('mutation module (e2e)', () => {
     });
   });
 
+  it('/api/user (PATCH) 400 (updated with used email)', async () => {
+    const response = await request(app.getHttpServer())
+      .patch('/api/user')
+      .set('Authorization' as any, `Bearer ${sessional_jwt}`).send({
+        email: "tsaqifradhitya@gmail.com"
+      })
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('statusCode');
+    expect(response.body).toHaveProperty('message');
+    expect(response.body).toHaveProperty('error');
+    const { statusCode, message, error } = response.body;
+    expect(statusCode).toBe(400);
+    expect(message).toBe('Bad Request');
+    expect(error).toHaveProperty('email');
+
+    (error.email as string[]).forEach((err) => {
+      expect(typeof err).toBe('string');
+    });
+  });
+
   it('/api/user (PATCH) 400 (all field empty)', async () => {
     const response = await request(app.getHttpServer())
       .patch('/api/user')

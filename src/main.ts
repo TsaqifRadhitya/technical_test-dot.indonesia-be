@@ -25,8 +25,6 @@ async function bootstrap() {
           }
         });
 
-        console.log(process.env.DB_TYPE);
-
         return new BadRequestException({
           statusCode: 400,
           message: 'Bad Request',

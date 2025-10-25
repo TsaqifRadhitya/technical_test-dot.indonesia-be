@@ -14,7 +14,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   findOne(option: FindOneOptions<User>) {
     return this.userRepository.findOne(option);
@@ -32,10 +32,20 @@ export class UserService {
       });
     }
 
-    await this.userRepository.save({
-      id: id,
-      ...updateUserDto,
-    });
+    try {
+      await this.userRepository.save({
+        id: id,
+        ...updateUserDto,
+      });
+    } catch {
+      throw new BadRequestException({
+        statusCode: 400,
+        message: 'Bad Request',
+        error: {
+          email: ['email already exist'],
+        },
+      });
+    }
 
     return this.userRepository.findOne({
       where: { id: id },
