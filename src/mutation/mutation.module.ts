@@ -9,4 +9,4 @@ import { Mutation } from './entities/mutation.entity';
   controllers: [MutationController],
   providers: [MutationService],
 })
-export class MutationModule { }
+export class MutationModule {}

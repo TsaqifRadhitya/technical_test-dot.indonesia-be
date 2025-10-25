@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -8,96 +12,100 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-
-  constructor(@InjectRepository(User) private userRepository: Repository<User>) {
-
-  }
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
 
   findOne(option: FindOneOptions<User>) {
-    return this.userRepository.findOne(option)
+    return this.userRepository.findOne(option);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (!updateUserDto.email && !updateUserDto.name) {
       throw new BadRequestException({
         statusCode: 400,
-        message: "Bad Request",
+        message: 'Bad Request',
         error: {
-          name: ["name is required if other field is empty"],
-          email: ["email is required if other field is empty"],
-        }
-      })
+          name: ['name is required if other field is empty'],
+          email: ['email is required if other field is empty'],
+        },
+      });
     }
 
     await this.userRepository.save({
       id: id,
-      ...updateUserDto
-    })
+      ...updateUserDto,
+    });
 
     return this.userRepository.findOne({
-      where: { id: id }, select: {
+      where: { id: id },
+      select: {
         email: true,
         created_at: true,
         id: true,
         name: true,
-        updated_at: true
-      }
-    })
+        updated_at: true,
+      },
+    });
   }
 
   remove(id: number) {
     this.userRepository.softDelete({
-      id: id
-    })
+      id: id,
+    });
   }
 
   async getSaldo(id: number) {
     const userData = await this.userRepository.findOne({
       where: {
-        id: id
+        id: id,
       },
-      relationLoadStrategy: "query",
+      relationLoadStrategy: 'query',
       loadEagerRelations: true,
       relations: {
-        mutations: true
-      }
-    })
+        mutations: true,
+      },
+    });
 
-    const { mutations } = userData!
+    const { mutations } = userData!;
 
-    const saldo = mutations.reduce((prev, current) => current.transaction_type == "deposit" ? prev + current.amount : prev - current.amount, 0)
-    return saldo
+    const saldo = mutations.reduce(
+      (prev, current) =>
+        current.transaction_type == 'deposit'
+          ? prev + current.amount
+          : prev - current.amount,
+      0,
+    );
+    return saldo;
   }
 
   async updatePassword(userId: number, newData: UpdatePasswordDTO) {
-    const newPassword = await bcrypt.hash(newData.new_password, 10)
+    const newPassword = await bcrypt.hash(newData.new_password, 10);
     const user = await this.userRepository.findOne({
       where: {
-        id: userId
-      }
-    })
+        id: userId,
+      },
+    });
 
     if (!(await bcrypt.compare(newData.current_password, user!.password))) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException();
     }
 
-    await this.userRepository.save(
-      {
-        id: userId,
-        password: newPassword
-      }
-    );
+    await this.userRepository.save({
+      id: userId,
+      password: newPassword,
+    });
   }
 
   async restoreSoftDelete(id: number) {
-    return this.userRepository.restore(id)
+    return this.userRepository.restore(id);
   }
 
   async softDelete(id: number) {
-    return await this.userRepository.softDelete(id)
+    return await this.userRepository.softDelete(id);
   }
 
   async create(data: Partial<User>) {
-    return this.userRepository.save(data)
+    return this.userRepository.save(data);
   }
 }

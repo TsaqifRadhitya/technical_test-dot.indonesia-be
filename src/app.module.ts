@@ -6,23 +6,29 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseConfig } from './config/database';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MutationModule, UserModule, TypeOrmModule.forRoot({
-      type: process.env.DB_TYPE as any || "sqlite",
-      host: process.env.DB_HOST || "localhost",
-      username: process.env.DB_USER || "postgres",
-      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
-      database: process.env.DB_NAME || "nestjs",
+    MutationModule,
+    UserModule,
+    TypeOrmModule.forRoot({
+      type: DatabaseConfig.type,
+      host: DatabaseConfig.host,
+      username: DatabaseConfig.username,
+      port: DatabaseConfig.port,
+      database: DatabaseConfig.database,
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV === "production" ? false : true,
-      keepAlive: true
-    }), AuthModule],
+      synchronize: DatabaseConfig.synchronize,
+      password: DatabaseConfig.password,
+      keepAlive: true,
+    }),
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
